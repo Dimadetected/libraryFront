@@ -16,18 +16,24 @@
           <li class="nav-item active">
             <a class="nav-link" href="#" v-bind:class="{ 'b text-primary': selectedMenu('tags')}" @click="updateMenu('tags')">Категории</a>
           </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="#" v-bind:class="{ 'b text-primary': selectedMenu('tags')}" @click="updateMenu('favorites')">Избранное</a>
+          </li>
         </ul>
       </div>
     </nav>
     <div class="container">
       <div v-if="menuClick === 'books'">
-        <Books></Books>
+        <Books :user_id="1"></Books>
       </div>
       <div v-else-if="menuClick === 'authors'">
         <Authors></Authors>
       </div>
       <div v-else-if="menuClick === 'tags'">
         <Tags></Tags>
+      </div>
+      <div v-else-if="menuClick === 'favorites'">
+        <Favorites :user_id="1"></Favorites>
       </div>
     </div>
   </div>
@@ -44,13 +50,15 @@
 import Books from './Books.vue'
 import Authors from './Authors.vue'
 import Tags from './Tags.vue'
+import Favorites from './Favorites.vue'
 
 export default {
   name: 'HelloWorld',
   components: {
     Books,
     Authors,
-    Tags
+    Tags,
+    Favorites,
   },
   props: {
     msg: String

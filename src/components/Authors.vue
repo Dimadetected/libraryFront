@@ -106,6 +106,9 @@ export default {
           })
     },
     async authorSave() {
+      if (!confirm('Вы точно хотите сохранить изменения ?')) {
+        return
+      }
       var path = 'http://localhost:8000/authors/store'
       if (this.formID !== 0) {
        path = 'http://localhost:8000/authors/update/' + this.formID

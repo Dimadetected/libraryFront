@@ -88,6 +88,10 @@ export default {
           })
     },
     async tagSave() {
+      if (!confirm('Вы точно хотите сохранить изменения ?')) {
+        return
+      }
+
       var path = 'http://localhost:8000/tags/store'
       if (this.formID !== 0) {
        path = 'http://localhost:8000/tags/update/' + this.formID
