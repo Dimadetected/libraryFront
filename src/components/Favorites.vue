@@ -44,7 +44,7 @@
           <div class="form-group">
             <div class="row">
               <div class="col-4">Книга:</div>
-              <div class="col-8"> {{ this.getBookName(processingFormBookID) }}</div>
+              <div class="col-8" style="text-align: left !important;"> {{ this.getBookName(processingFormBookID) }}</div>
             </div>
           </div>
         </div>
@@ -54,10 +54,12 @@
               <div class="col-4 mt-3">
                 <label for="processingFormPages">Количество страниц в книге:</label>
               </div>
-              <div class="col-8">
+              <div class="col-8" v-if="processingFormID === 0">
                 <input type="text" id="processingFormPages" class="form-control col-8" v-model="processingFormPages"
                        aria-label="Название">
               </div>
+              <div class="col-8" style="text-align: left !important;" v-else> <b> {{ processingFormPages }}</b></div>
+
             </div>
           </div>
         </div>
@@ -85,13 +87,15 @@
             <th>Прочтено</th>
             <th>Всего</th>
             <th>Дата</th>
+            <th></th>
           </tr>
           </thead>
           <tbody>
-          <tr v-for="pc in processingsArr" :key="pc.id">
+          <tr v-for="(pc,index) in processingsArr" :key="pc.id" :class="getClassTable(index)">
             <td v-if="SelectedProcessingID === pc.book_id"> {{pc.page}} <span class="text-success">({{pc.page * 100 / pc.pages}}%)</span></td>
             <td v-if="SelectedProcessingID === pc.book_id"> {{pc.pages}}</td>
             <td v-if="SelectedProcessingID === pc.book_id"> {{pc.created}}</td>
+            <td v-if="SelectedProcessingID === pc.book_id"> <div class="btn btn-danger" @click="deleteProcessing(pc.id)">Удалить</div> </td>
           </tr>
           </tbody>
         </table>
@@ -125,6 +129,7 @@ export default {
       processings: [],
       processingsArr: [],
 
+      processingFormID: 0,
       processingFormUserID: 0,
       processingFormBookID: 0,
       processingFormPage: 0,
@@ -135,6 +140,26 @@ export default {
     this.favoritesGet()
   },
   methods: {
+    getClassTable(id){
+      var table = ""
+      if (id === 0){
+        table = "table-success"
+      }
+
+      return table
+    },
+    async deleteProcessing(id){
+      if (!confirm('Вы точно хотите сохранить изменения ?')) {
+        return
+      }
+
+      var path = 'http://localhost:8000/books/processing/delete/'+ id
+      await fetch(path, {
+        method: "post",
+      })
+
+      await this.processingGet()
+    },
     favoriteEdit(id) {
       this.favorites.map(favorite => {
         if (id === favorite.id) {
@@ -171,7 +196,9 @@ export default {
               this.processingsArr = res.data
               this.processings = new Map()
               res.data.map(p => {
-                this.processings.set(p.book_id, p)
+                if (!this.processings.has(p.book_id)) {
+                  this.processings.set(p.book_id, p)
+                }
               })
             }
           })
@@ -215,6 +242,7 @@ export default {
       }
     },
     async processingFix(favorite) {
+      this.processingFormID = 0
       this.processingFormPage = 0
       this.processingFormPages = 0
       this.processingFormBookID = favorite.book_id
@@ -222,6 +250,7 @@ export default {
 
       this.favoritesShow = "create"
       if (this.processings.has(favorite.book_id)) {
+        this.processingFormID = favorite.id
         this.processingFormBookID = this.processings.get(favorite.book_id).book_id
         this.processingFormUserID = this.processings.get(favorite.book_id).user_id
         this.processingFormPage = this.processings.get(favorite.book_id).page
