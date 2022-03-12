@@ -149,7 +149,7 @@ export default {
       return table
     },
     async deleteProcessing(id){
-      if (!confirm('Вы точно хотите сохранить изменения ?')) {
+      if (!confirm('Вы точно хотите удалить ?')) {
         return
       }
 
