@@ -1,5 +1,40 @@
 <template>
   <div class="col-md-12">
+    <div class="row">
+      <div class="col-md-3">Название</div>
+      <div class="col-md-3">Автор</div>
+      <div class="col-md-3">Год</div>
+      <div class="col-md-3">Категории</div>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        <input type="text" class="form-control "
+               v-model="filterName" aria-label="Название" @change="booksGet()">
+      </div>
+      <div class="col-md-3">
+        <select class="form-control" name="" v-model="filterAuthor" @change="booksGet()">
+          <option value="0">Все</option>
+          <option v-for="(name,id) in authors" :key="id" :value="id">{{name}}</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <input type="text" class="form-control "
+               v-model="filterYear" aria-label="Название" @change="booksGet()">
+      </div>
+      <div class="col-md-3">
+        <select class="form-control" name="" v-model="filterTags">
+          <option value="0">Все</option>
+          <option v-for="(name,id) in tagsMap" :key="id" :value="id">{{name}}</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-auto my-1" v-for="(name,id) in formTagIdsFilter" :key="id">
+        <button class="btn" :class="'btn-primary'"
+                @click="changeTagStatusFilter(name)">{{ tagsMap[name] }}
+        </button>
+      </div>
+    </div>
     <div class="row my-3">
       <div class="text-right col-md-2 offset-md-10">
         <div v-if="booksShow === 'all'" class="btn btn-success" @click="booksShowChange('create')">Добавить</div>
@@ -258,12 +293,28 @@ export default {
       required: true,
     }
   },
+  watch: {
+    filterTags: function (val, oldVal) {
+      console.log(oldVal)
+      if (this.formTagIdsFilter.indexOf(val) === -1)
+        this.formTagIdsFilter.push(val)
+      else {
+        this.formTagIdsFilter.splice(this.formTagIdsFilter.indexOf(val), 1)
+      }
+      this.booksGet()
+    },
+  },
   data() {
     return {
       actionBookID: 0,
       actionBook: {},
       reviews: [],
       reviewsGrades: [],
+
+      filterName: "",
+      filterTags: "",
+      filterYear: "",
+      filterAuthor: 0,
 
       favorites: [],
       favoritesMap: [],
@@ -281,6 +332,7 @@ export default {
       formYear: '2022',
       formAge: "16+",
       formTagIds: [],
+      formTagIdsFilter: [],
 
       booksShow: "all",
       books: [],
@@ -295,6 +347,14 @@ export default {
     this.getFavorites()
   },
   methods: {
+    changeTagStatusFilter: function (val) {
+      if (this.formTagIdsFilter.indexOf(val) === -1)
+        this.formTagIdsFilter.push(val)
+      else{
+        this.formTagIdsFilter.splice(this.formTagIdsFilter.indexOf(val), 1)
+      }
+      this.booksGet()
+    },
     handleFileUpload(e) {
       this.formFile = e.target.files[0];
     },
@@ -369,7 +429,7 @@ export default {
       this.reviewsGet()
     },
     booksGet() {
-      fetch('http://localhost:8000/books?limit=10000000&offset=0')
+      fetch('http://localhost:8000/books?limit=10000000&offset=0&author_id='+this.filterAuthor + '&name='+ this.filterName + '&year='+this.filterYear + "&tags="+this.formTagIdsFilter)
           .then(res => res.json())
           .then(res => {
             this.books = res.data
@@ -451,6 +511,7 @@ export default {
       else
         this.formTagIds.splice(this.formTagIds.indexOf(id), 1)
     },
+
     async deleteBook(book_id) {
       if (confirm('Вы точно хотите удалить книгу?')) {
         await fetch('http://localhost:8000/books/delete/' + book_id,
