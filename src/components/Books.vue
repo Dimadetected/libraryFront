@@ -312,7 +312,7 @@ export default {
       reviewsGrades: [],
 
       filterName: "",
-      filterTags: "",
+      filterTags: 0,
       filterYear: "",
       filterAuthor: 0,
 
