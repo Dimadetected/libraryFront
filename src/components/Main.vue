@@ -13,10 +13,10 @@
                 <li class="nav-item active">
                   <a class="nav-link" href="#" v-bind:class="{ 'b text-primary':selectedMenu('books')}" @click="updateMenu('books')">Книги</a>
                 </li>
-                <li class="nav-item active">
+                <li class="nav-item active" v-if="user_id === 18">
                   <a class="nav-link" href="#" v-bind:class="{ 'b text-primary': selectedMenu('authors')}" @click="updateMenu('authors')">Авторы</a>
                 </li>
-                <li class="nav-item active">
+                <li class="nav-item active" v-if="user_id === 18">
                   <a class="nav-link" href="#" v-bind:class="{ 'b text-primary': selectedMenu('tags')}" @click="updateMenu('tags')">Категории</a>
                 </li>
                 <li class="nav-item active">

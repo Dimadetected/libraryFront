@@ -23,7 +23,7 @@
         <td>
           <div v-if="processings.has(favorite.book_id)">
             <span class="text-primary">{{ processings.get(favorite.book_id).page }}</span> / <span class="text-success">{{ processings.get(favorite.book_id).pages }}</span>
-            | {{ processings.get(favorite.book_id).page * 100 / processings.get(favorite.book_id).pages }}%
+            | {{ (processings.get(favorite.book_id).page * 100 / processings.get(favorite.book_id).pages).toFixed(2) }}%
           </div>
           <div v-else>
             0 / 0 | 0%
@@ -185,22 +185,22 @@ export default {
           .then(res => {
             this.favorites = res.data
           })
-
-      await this.booksGet()
     },
     async processingGet() {
       await fetch('http://localhost:8000/books/processing/' + this.user_id)
           .then(res => res.json())
           .then(res => {
+            this.processings = new Map()
             if (res.data.length > 0) {
               this.processingsArr = res.data
-              this.processings = new Map()
               res.data.map(p => {
                 if (!this.processings.has(p.book_id)) {
                   this.processings.set(p.book_id, p)
                 }
               })
             }
+            console.log("proc",this.processings)
+
           })
     },
     getBookName(id) {
@@ -249,6 +249,7 @@ export default {
       this.processingFormUserID = favorite.user_id
 
       this.favoritesShow = "create"
+      console.log("test:",this.processings)
       if (this.processings.has(favorite.book_id)) {
         this.processingFormID = favorite.id
         this.processingFormBookID = this.processings.get(favorite.book_id).book_id

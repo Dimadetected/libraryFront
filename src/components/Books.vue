@@ -68,7 +68,7 @@
               {{ book.description }}
             </p>
           </div>
-          <div class="col-md-12 mt-4">
+          <div class="col-md-12 mt-4" v-if="user_id === 18">
             <div class="row">
               <div class="offset-7 col-md-2">
                 <div class="btn btn-primary" @click="bookEdit(book.id)">Редактировать</div>
